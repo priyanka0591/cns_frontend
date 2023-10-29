@@ -2,17 +2,94 @@ import Image from "next/image";
 import styles from "../styles/index.module.css";
 import homeImage from "../public/home.png";
 import { BiSolidUserCircle } from "react-icons/bi";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RiLockPasswordFill } from "react-icons/ri";
 import backgroundImg from "../public/background.png";
 import Head from "next/head";
 import { NextRouter, useRouter } from "next/router";
+import { notification } from "antd";
+import { serverUrl } from "@/data/server";
 
 export default function SingupPage() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPassRef = useRef<HTMLInputElement>(null);
   const router: NextRouter = useRouter();
+  const [api, contextHolder] = notification.useNotification();
+  const [loading, setLoading] = useState(false);
+
+  const [token, setToken] = useState("");
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.localStorage) {
+      const dtoken = localStorage.getItem("token");
+      // console.log(dtoken);
+      if (dtoken != null) {
+        setToken(dtoken);
+      }
+    }
+  }, [router]);
+
+  const formSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    const email = usernameRef.current?.value;
+    const password = passwordRef.current?.value;
+    const confirmPassword = confirmPassRef.current?.value;
+
+    if (email == null || password == null || confirmPassword == null) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${serverUrl}/user/signup`, {
+        method: "POST",
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          confirmPassword: confirmPassword,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (data.error) {
+        api["error"]({
+          message: data.error,
+          duration: 10,
+        });
+      }
+
+      if (data.id) {
+        api["success"]({
+          message: "Sign up Successfully",
+          duration: 5,
+        });
+
+        if (token === "" || token == null) {
+          router.replace("/");
+        } else {
+          router.replace("/dashboard");
+        }
+      }
+      // console.log(data);
+    } catch (error) {
+      api["info"]({
+        message: "Something went wrong, Please try again later.",
+        duration: 10,
+      });
+    }
+    if (usernameRef.current) {
+      usernameRef.current.value = "";
+    }
+    if (passwordRef.current) {
+      passwordRef.current.value = "";
+    }
+    if (confirmPassRef.current) {
+      confirmPassRef.current.value = "";
+    }
+    setLoading(false);
+  };
 
   return (
     <>
@@ -22,6 +99,7 @@ export default function SingupPage() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      {contextHolder}
       <div className={styles.container}>
         <div className={styles.imgContainer}>
           <Image src={homeImage} alt="home page image" />
@@ -31,7 +109,7 @@ export default function SingupPage() {
             <Image src={backgroundImg} alt="background image" />
           </div>
           <h1>SIGN UP</h1>
-          <form className={styles.form}>
+          <form className={styles.form} onSubmit={formSubmitHandler}>
             <div className={styles.formDiv}>
               <label className={styles.title}>
                 <BiSolidUserCircle /> <p>Email</p>
@@ -50,8 +128,10 @@ export default function SingupPage() {
               </label>
               <input type="password" ref={confirmPassRef} required />
             </div>
-            <button type="submit">Sign Up</button>
-            <div className={styles.shift}>
+            {loading && <span className={styles.loader}></span>}
+            {!loading && <button type="submit">Sign in</button>}
+
+            {/* <div className={styles.shift}>
               <p
                 onClick={() => {
                   router.replace("/");
@@ -59,7 +139,7 @@ export default function SingupPage() {
               >
                 Already have an account ?
               </p>
-            </div>
+            </div> */}
           </form>
         </div>
       </div>

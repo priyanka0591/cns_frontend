@@ -7,11 +7,65 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import backgroundImg from "../public/background.png";
 import Head from "next/head";
 import { NextRouter, useRouter } from "next/router";
+import { serverUrl } from "@/data/server";
+import { notification } from "antd";
 
 export default function Home() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const router: NextRouter = useRouter();
+  const [api, contextHolder] = notification.useNotification();
+
+  const formSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const email = usernameRef.current?.value;
+    const password = passwordRef.current?.value;
+
+    if (email == null || password == null) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${serverUrl}/user/login`, {
+        method: "POST",
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (data.error) {
+        api["error"]({
+          message: data.error,
+          duration: 5,
+        });
+      }
+
+      if (typeof window !== "undefined" && window.localStorage && data.token) {
+        localStorage.setItem("token", data.token);
+        api["success"]({
+          message: "Login Successful",
+          duration: 5,
+        });
+        router.replace("/dashboard");
+      }
+      // console.log(data);
+    } catch (error) {
+      api["info"]({
+        message: "Something went wrong, Please try again later.",
+        duration: 10,
+      });
+    }
+    if (usernameRef.current) {
+      usernameRef.current.value = "";
+    }
+    if (passwordRef.current) {
+      passwordRef.current.value = "";
+    }
+  };
 
   return (
     <>
@@ -21,6 +75,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      {contextHolder}
       <div className={styles.container}>
         <div className={styles.imgContainer}>
           <Image src={homeImage} alt="home page image" />
@@ -30,7 +85,7 @@ export default function Home() {
             <Image src={backgroundImg} alt="background image" />
           </div>
           <h1>SIGN IN</h1>
-          <form className={styles.form}>
+          <form className={styles.form} onSubmit={formSubmitHandler}>
             <div className={styles.formDiv}>
               <label className={styles.title}>
                 <BiSolidUserCircle /> <p>Email</p>
@@ -45,13 +100,13 @@ export default function Home() {
             </div>
             <button type="submit">Sign in</button>
             <div className={styles.shift}>
-            <p
-              onClick={() => {
-                router.replace("/signup");
-              }}
-            >
-              Don&apos;t have an account ?
-            </p>
+              <p
+                onClick={() => {
+                  router.replace("/signup");
+                }}
+              >
+                Don&apos;t have an account ?
+              </p>
             </div>
           </form>
         </div>
