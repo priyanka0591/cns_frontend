@@ -10,16 +10,22 @@ import { NextRouter, useRouter } from "next/router";
 import { notification } from "antd";
 import { serverUrl } from "@/data/server";
 
-export default function SingupPage() {
+export default function EditPage() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPassRef = useRef<HTMLInputElement>(null);
+  const [isFirst, setIsFirst] = useState(true);
   const router: NextRouter = useRouter();
+  //   console.log(router.query);
   const [api, contextHolder] = notification.useNotification();
   const [loading, setLoading] = useState(false);
 
   const [token, setToken] = useState("");
+
   useEffect(() => {
+    if (usernameRef.current) {
+      usernameRef.current.value = router.query.email as string;
+    }
     if (typeof window !== "undefined" && window.localStorage) {
       const dtoken = localStorage.getItem("token");
       // console.log(dtoken);
@@ -41,17 +47,21 @@ export default function SingupPage() {
     }
 
     try {
-      const res = await fetch(`${serverUrl}/user/signup`, {
-        method: "POST",
-        body: JSON.stringify({
-          email: email,
-          password: password,
-          confirmPassword: confirmPassword,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await fetch(
+        `${serverUrl}/user/update/${router.query.userId}`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: email,
+            password: password,
+            confirmPassword: confirmPassword,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `bearer ${token}`,
+          },
+        }
+      );
       const data = await res.json();
       if (data.error) {
         api["error"]({
@@ -60,19 +70,13 @@ export default function SingupPage() {
         });
       }
 
-      if (data.id) {
+      if (data.result) {
         api["success"]({
-          message: "Sign up Successfully",
+          message: "User data updated Successfully",
           duration: 5,
         });
-
-        // if (token === "" || token == null) {
-        //   router.replace("/");
-        // } else {
-        //   router.replace("/dashboard");
-        // }
+        router.replace("/dashboard");
       }
-      // console.log(data);
     } catch (error) {
       api["info"]({
         message: "Something went wrong, Please try again later.",
@@ -108,7 +112,7 @@ export default function SingupPage() {
           <div className={styles.background}>
             <Image src={backgroundImg} alt="background image" />
           </div>
-          <h1>SIGN UP</h1>
+          <h1>Update User Data</h1>
           <form className={styles.form} onSubmit={formSubmitHandler}>
             <div className={styles.formDiv}>
               <label className={styles.title}>
@@ -129,7 +133,7 @@ export default function SingupPage() {
               <input type="password" ref={confirmPassRef} required />
             </div>
             {loading && <span className={styles.loader}></span>}
-            {!loading && <button type="submit">Sign in</button>}
+            {!loading && <button type="submit">Update User</button>}
 
             {/* <div className={styles.shift}>
               <p

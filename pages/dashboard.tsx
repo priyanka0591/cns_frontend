@@ -5,12 +5,8 @@ import { serverUrl } from "@/data/server";
 import { useRouter } from "next/router";
 import { notification } from "antd";
 import LoadingSpinner from "@/component/LoadingSpinner";
-
-interface userType {
-  _id: string;
-  email: string;
-  password: string;
-}
+import { userType } from "@/model/userModel";
+import EditPage from "./edit";
 
 export default function Dashboard(): JSX.Element {
   const router = useRouter();
@@ -61,6 +57,16 @@ export default function Dashboard(): JSX.Element {
 
   const updateHandler = (event: any) => {
     const userId = event.currentTarget.id;
+    const foundUser = data.find((user) => user._id === userId);
+    // console.log(foundUser);
+    // return <EditPage />
+    router.push({
+      pathname: "/edit",
+      query: {
+        userId: foundUser?._id,
+        email: foundUser?.email,
+      },
+    });
   };
 
   const dataFetchHandler = useCallback(async () => {
