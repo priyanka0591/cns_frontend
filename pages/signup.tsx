@@ -8,9 +8,10 @@ import backgroundImg from "../public/background.png";
 import Head from "next/head";
 import { NextRouter, useRouter } from "next/router";
 
-export default function Home() {
+export default function SingupPage() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const confirmPassRef = useRef<HTMLInputElement>(null);
   const router: NextRouter = useRouter();
 
   return (
@@ -29,7 +30,7 @@ export default function Home() {
           <div className={styles.background}>
             <Image src={backgroundImg} alt="background image" />
           </div>
-          <h1>SIGN IN</h1>
+          <h1>SIGN UP</h1>
           <form className={styles.form}>
             <div className={styles.formDiv}>
               <label className={styles.title}>
@@ -43,15 +44,21 @@ export default function Home() {
               </label>
               <input type="password" ref={passwordRef} required />
             </div>
-            <button type="submit">Sign in</button>
+            <div className={styles.formDiv}>
+              <label className={styles.title}>
+                <RiLockPasswordFill /> <p>Confirm Password</p>
+              </label>
+              <input type="password" ref={confirmPassRef} required />
+            </div>
+            <button type="submit">Sign Up</button>
             <div className={styles.shift}>
-            <p
-              onClick={() => {
-                router.replace("/signup");
-              }}
-            >
-              Don&apos;t have an account ?
-            </p>
+              <p
+                onClick={() => {
+                  router.replace("/");
+                }}
+              >
+                Already have an account ?
+              </p>
             </div>
           </form>
         </div>
