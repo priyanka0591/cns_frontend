@@ -28,18 +28,24 @@ export default function Navbar(): JSX.Element {
   console.log(token);
   return (
     <div className={classes.container}>
-      <h1>CNS - KVP</h1>
+      <h1>Admin Portal</h1>
       <ul>
         {token !== "" ? (
           <li>
             <Link href={"/dashboard"}>Dashboard</Link>
           </li>
         ) : null}
+        {token !== "" && (
+          <li>
+            <Link href={"/edit"}>Update Profile</Link>
+          </li>
+        )}
         {token !== "" ? (
           <li>
             <Link href={"/signup"}>Add new User</Link>
           </li>
         ) : null}
+
         {token === "" ? (
           <li>
             <Link href={"/"}>Login</Link>

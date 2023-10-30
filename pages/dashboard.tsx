@@ -141,7 +141,7 @@ export default function Dashboard(): JSX.Element {
             <th>Sr no.</th>
             <th>Email</th>
             <th>Hashed Password</th>
-            <th>Actions</th>
+            {/* <th>Actions</th> */}
           </tr>
           {data.map((result, index) => {
             return (
@@ -149,24 +149,24 @@ export default function Dashboard(): JSX.Element {
                 <td>{index + 1}</td>
                 <td>{result.email}</td>
                 <td>{result.password}</td>
-                <td>
-                  <div className={classes.actions}>
-                    <button
+                {/* <td> */}
+                  {/* <div className={classes.actions}> */}
+                    {/* <button
                       onClick={deleteHandler}
                       id={result._id}
                       className={classes.delete}
                     >
                       <MdDelete />
-                    </button>
-                    <button
+                    </button> */}
+                    {/* <button
                       onClick={updateHandler}
                       id={result._id}
                       className={classes.edit}
                     >
                       <MdEdit />
-                    </button>
-                  </div>
-                </td>
+                    </button> */}
+                  {/* </div> */}
+                {/* </td> */}
               </tr>
             );
           })}
