@@ -28,11 +28,17 @@ export default function Navbar(): JSX.Element {
   console.log(token);
   return (
     <div className={classes.container}>
-      <h1>Admin Portal</h1>
+      <h1>Form Builder</h1>
       <ul>
         {token !== "" ? (
           <li>
             <Link href={"/dashboard"}>Dashboard</Link>
+          </li>
+        ) : null}
+
+        {token !== "" ? (
+          <li>
+            <Link href={"/admin"}>Admins</Link>
           </li>
         ) : null}
         {token !== "" && (
@@ -40,11 +46,14 @@ export default function Navbar(): JSX.Element {
             <Link href={"/edit"}>Update Profile</Link>
           </li>
         )}
-        {token !== "" ? (
+        {/* {token !== "" ? (
           <li>
             <Link href={"/signup"}>Add new User</Link>
           </li>
-        ) : null}
+        ) : null} */}
+        {/* <li>
+          <Link href={"http://localhost:3001/create-new-form"}>Create new Form</Link>
+        </li> */}
 
         {token === "" ? (
           <li>

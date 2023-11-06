@@ -1,1 +1,1 @@
-export let serverUrl: String = "https://puce-successful-whale.cyclic.app";
+export let serverUrl: String = "http://localhost:8000";
